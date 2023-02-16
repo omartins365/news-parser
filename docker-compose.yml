@@ -39,6 +39,7 @@ services:
         container_name: mysql8-container
         ports:
             - "4306:3306"
+            - "43060:33060"
         volumes:
             - ./mysql:/var/lib/mysql
         command: --default-authentication-plugin=mysql_native_password --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
@@ -46,6 +47,8 @@ services:
         environment:
             MYSQL_ROOT_PASSWORD: secret
             MYSQL_PASSWORD: secret
+            MYSQL_DATABASE: news_db
+            MYSQL_USER: amo
         networks:
             - nginx-php74-mysql8-node
 
@@ -59,21 +62,10 @@ services:
         networks:
              - nginx-php74-mysql8-node
     rabbitmq:
-        image: rabbitmq
+        image: rabbitmq:3-management
+        environment:
+            RABBITMQ_DEFAULT_USER: rabbitmq_user
+            RABBITMQ_DEFAULT_PASS: rabbitmq_password
         ports:
             - "15672:15672"
-            - "5671:5671"
-        environment:
-            RABBITMQ_DEFAULT_USER: user
-            RABBITMQ_DEFAULT_PASS: password
-        networks:
-             - nginx-php74-mysql8-node
-    # node
-    # node-service:
-    #     image: node:latest
-    #     container_name: node-container
-    #     volumes:
-    #         - ./app:/var/www/project
-    #     working_dir: /var/www/project
-    #     networks:
-    #         - nginx-php74-mysql8-node
+            - "5672:5672"

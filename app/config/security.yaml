@@ -1,0 +1,30 @@
+security:
+    encoders:
+        App\Entity\User:
+            algorithm: auto
+
+    providers:
+        db_provider:
+            entity:
+                class: App\Entity\User
+                property: email
+
+    firewalls:
+        dev:
+            pattern: ^/(_(profiler|wdt)|css|images|js)/
+            security: false
+
+        main:
+            anonymous: true
+            form_login:
+                login_path: app_login
+                check_path: app_login
+                default_target_path: app_homepage
+            logout:
+                path: app_logout
+                target: app_homepage
+
+    access_control:
+        - { path: ^/admin, roles: ROLE_ADMIN }
+        - { path: ^/moderator, roles: ROLE_MODERATOR }
+        - { path: ^/news, roles: IS_AUTHENTICATED_FULLY }
