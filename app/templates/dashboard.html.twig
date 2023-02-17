@@ -1,51 +1,63 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="#">Dashboard</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav">
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Link 1</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#">Link 2</a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </nav>
-    <div class="container my-4">
-    <h1>Recent News</h1>
-        
-	{% for newsItem in news %}
-		<div class="card mb-3 p-3">
-			<h4>{{ newsItem.title }}</h4>
-			<p>{{ newsItem.description }}</p>
-		</div>
-	{% endfor %}
 
+	<div class="container my-4">
+		<h1>Recent News</h1>
 
-	{% if news.getTotalItemCount > 0 %}
-		{% include '@KnpPaginator/Pagination/bootstrap_v5_pagination.html.twig' with {'pagination': news, 
-            'pageRange': news.getPaginationData()['pageRange'],
-            'pagesInRange': news.getPaginationData()['pageRange'],
+		{% for newsItem in news %}
+			<div class="card mb-3 p-3">
+				<h4>{{ newsItem.title }}</h4>
+				<span class="text-info text-muted"> 
+				Updated {{ newsItem.updatedAt.format('Y-m-d H:i:s') }} | Posted {{ newsItem.date.format('Y-m-d H:i:s') }}
+				</span>
+				{% if newsItem.picture is not null %}
+					<img src="{{ newsItem.picture }}" alt="{{ newsItem.title }}" class="card-img-top">
+				{% endif %}
+				<p>{{ newsItem.description }}</p>
+				{% if is_granted('ROLE_ADMIN') %}
+					<form action="{{ path('delete_news_item', {'id': newsItem.id}) }}" method="POST">
+						<input type="hidden" name="_method" value="DELETE">
+						<input type="hidden" name="_token" value="{{ csrf_token('delete' ~ newsItem.id) }}">
+						<button type="submit" class="btn btn-danger">Delete</button>
+					</form>
+				{% endif %}
+
+			</div>
+		{% endfor %}
+
+		{% if news.getTotalItemCount > 0 %}
+			{% include '@KnpPaginator/Pagination/bootstrap_v5_pagination.html.twig' with {'pagination': news, 
+           'pageRange': news.getPaginationData()['pageRange'],
+            'pagesInRange': news.getPaginationData()["pagesInRange"],
                 'searchParam': 'page',
                 'sortParam': 'sort',
                 'template': '@KnpPaginator/Pagination/sliding.html.twig',
                 'containerClass': '',
                 'align': 'center',
                 'size': 'sm',
-                'pageCount': news.getPageCount(),
-                'startPage': news.getPaginationData()['startPage'],
-                
-                'endPage': news.getPageCount(),
+                'pageCount': news.getPaginationData()["pageCount"],
+                'endPage': news.getPaginationData()['endPage'],
+				'last': news.getPaginationData()["last"],
+				'current': news.getPaginationData()["current"],
+				'numItemsPerPage': news.getPaginationData()["numItemsPerPage"],
+				'first': news.getPaginationData()["first"],
+				'pageCount': news.getPaginationData()["pageCount"],
+				'totalCount': news.getPaginationData()["totalCount"],
+				'startPage': news.getPaginationData()["startPage"],
+				'endPage': news.getPaginationData()["endPage"],
+				'next': news.getPaginationData()["next"]??null,
+				'previous': news.getPaginationData()["previous"]??null,
+				'route': 'dashboard',
+				'query': [],
+				'pageParameterName': 'page',
+				'firstPageInRange' : news.getPaginationData()["firstPageInRange"]??null,				 
+				'lastPageInRange' : news.getPaginationData()["lastPageInRange"]??null,
+				'currentItemCount' : news.getPaginationData()["currentItemCount"]??null,
+				'firstItemNumber' : news.getPaginationData()["firstItemNumber"]??null,
+				'lastItemNumber' : news.getPaginationData()["lastItemNumber"]??null,
             } %}
-	{% endif %}
+		{% endif %}
 
-    </div>
+	</div>
 {% endblock %}

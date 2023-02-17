@@ -37,7 +37,8 @@ class NewsConsumer implements ConsumerInterface
             $title = $node->filter('a > h2')->text();
             $description = $node->filter('.lenta-item > p')->text();
             // dd($description);
-            $picture = $node->filter('div.lenta-image > img')->attr('src');
+            $picture = $node->filter('div.lenta-image > img.wp-post-image')->attr('data-lazy-src');
+            // dd($picture);
             $carbon = new Carbon();
             $timestr = $node->filter('.meta-datetime')->text();
             // dump($timestr);

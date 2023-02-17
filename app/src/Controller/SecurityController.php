@@ -41,7 +41,7 @@ class SecurityController extends AbstractController
         // last username entered by the user
         $lastEmail = $authenticationUtils->getLastUsername();
 
-        $form = $this->createForm(LoginType::class); 
+        $form = $this->createForm(LoginType::class);
         // dd($request->toArray());
         $form->handleRequest($request);
 
@@ -80,5 +80,25 @@ class SecurityController extends AbstractController
             // 'loginForm' => $form->createView()
             'form' => $form
         ]));
+    }
+
+    /**
+     * @Route("/logout", name="app_logout")
+     */
+    public function logout(Request $request)
+    {
+        // ...destroy session, or whatever
+        $this->get('security.token_storage')->setToken(null);
+        $request->getSession()->invalidate();
+        if ($this->get('session')->isStarted()) {
+            $this->get('session')->clear();
+            $this->get('session')->invalidate();
+        }
+        if (session_start()) {
+            session_destroy();
+        }
+
+        $this->addFlash('success', 'You have been logged out');
+        return $this->redirectToRoute('dashboard');
     }
 }

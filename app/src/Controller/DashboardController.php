@@ -12,21 +12,30 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 class DashboardController extends AbstractController
 {
-    private $paginator;
+    
 
-    public function __construct(PaginatorInterface $paginator)
+    public function __construct()
     {
-        $this->paginator = $paginator;
+        
     }
+    public function checkAction()
+    {
+        // this accounts for when the user tries to go directly to a protected route 
+        if (!$this->isGranted('ROLE_ADMIN') && !$this->isGranted('ROLE_MODERATOR')) {
+            return $this->redirectToRoute('app_login');
+        }
+        
+        // more code here
+    } 
 
     /**
      * @Route("/dashboard", name="dashboard")
      */
-    public function dashboard(Request $request): Response
+    public function dashboard(Request $request, PaginatorInterface $paginator): Response
     {
         // check if the user has the required roles
         if (!$this->isGranted('ROLE_ADMIN') && !$this->isGranted('ROLE_MODERATOR')) {
-            throw $this->createAccessDeniedException();
+            return $this->redirectToRoute('app_login');
         }
 
         // get the page number from the request parameters
@@ -39,7 +48,7 @@ class DashboardController extends AbstractController
         );
 
         // use the KnpPaginatorBundle to paginate the news entities
-        $news = $this->paginator->paginate(
+        $news = $paginator->paginate(
             $news,
             $page,
             10 // limit 10 news per page
