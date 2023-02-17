@@ -1,32 +1,33 @@
 security:
-    encoders:
-        App\Entity\User:
-            algorithm: auto
+  encoders:
+    App\Entity\User:
+      algorithm: auto
 
-    providers:
-        db_provider:
-            entity:
-                class: App\Entity\User
-                property: email
+  providers:
+    db_provider:
+      entity:
+        class: App\Entity\User
+        property: email
 
-    firewalls:
-        dev:
-            pattern: ^/(_(profiler|wdt)|css|images|js)/
-            security: false
+  firewalls:
+    dev:
+      pattern: ^/(_(profiler|wdt)|css|images|js)/
+      security: false
 
-        main:
-            anonymous: true
-            form_login:
-                enable_csrf: true
-                login_path: app_login
-                check_path: app_login
-                default_target_path: app_homepage
-            logout:
-                path: app_logout
-                target: app_homepage
-                methods: GET
+    main:
+      anonymous: true
+      form_login:
+        enable_csrf: true
+        login_path: app_login
+        check_path: app_login
+        default_target_path: app_homepage
+      logout:
+        path: app_logout
+        target: app_homepage
+        methods: GET
 
-    access_control:
-        - { path: ^/admin, roles: ROLE_ADMIN }
-        - { path: ^/moderator, roles: ROLE_MODERATOR }
-        - { path: ^/news, roles: IS_AUTHENTICATED_FULLY }
+  access_control:
+    - { path: ^/admin, roles: ROLE_ADMIN }
+    - { path: ^/moderator, roles: ROLE_MODERATOR }
+    - { path: ^/news, roles: IS_AUTHENTICATED_FULLY }
+    - { path: ^/dashboard, roles: [ROLE_ADMIN, ROLE_MODERATOR] }

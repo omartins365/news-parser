@@ -50,6 +50,9 @@
             "migrations/.gitignore"
         ]
     },
+    "knplabs/knp-paginator-bundle": {
+        "version": "v5.9.0"
+    },
     "php-amqplib/rabbitmq-bundle": {
         "version": "2.11",
         "recipe": {

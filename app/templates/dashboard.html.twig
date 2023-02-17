@@ -1,0 +1,51 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">Dashboard</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Link 1</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">Link 2</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <div class="container my-4">
+    <h1>Recent News</h1>
+        
+	{% for newsItem in news %}
+		<div>
+			<h2>{{ newsItem.title }}</h2>
+			<p>{{ newsItem.description }}</p>
+		</div>
+	{% endfor %}
+
+
+	{% if news.getTotalItemCount > 0 %}
+		{% include '@KnpPaginator/Pagination/bootstrap_v5_pagination.html.twig' with {'pagination': news, 
+            'pageRange': news.getPaginationData()['pageRange'],
+            'pagesInRange': news.getPaginationData()['pageRange'],
+                'searchParam': 'page',
+                'sortParam': 'sort',
+                'template': '@KnpPaginator/Pagination/sliding.html.twig',
+                'containerClass': '',
+                'align': 'center',
+                'size': 'sm',
+                'pageCount': news.getPageCount(),
+                'startPage': news.getPaginationData()['startPage'],
+                
+                'endPage': news.getPageCount(),
+            } %}
+	{% endif %}
+
+    </div>
+{% endblock %}

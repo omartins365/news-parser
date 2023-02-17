@@ -15,6 +15,7 @@
         "doctrine/orm": "*",
         "fakerphp/faker": "^1.21",
         "guzzlehttp/guzzle": "*",
+        "knplabs/knp-paginator-bundle": "^5.9",
         "nesbot/carbon": "^2.66",
         "php-amqplib/rabbitmq-bundle": "^2.11",
         "symfony/console": "5.4.*",
