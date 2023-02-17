@@ -1,7 +1,7 @@
 version: '3.4'
 
 networks:
-    nginx-php74-mysql8-node:
+    nginx-php74-mysql-rabbitmq:
 
 services:
 
@@ -18,7 +18,7 @@ services:
             - php74-service
             - mysql8-service
         networks:
-            - nginx-php74-mysql8-node
+            - nginx-php74-mysql-rabbitmq
 
     # php
     php74-service:
@@ -31,7 +31,7 @@ services:
         volumes:
             - ./app:/var/www/project
         networks:
-            - nginx-php74-mysql8-node
+            - nginx-php74-mysql-rabbitmq
 
     # mysql
     mysql8-service:
@@ -50,7 +50,7 @@ services:
             MYSQL_DATABASE: news_db
             MYSQL_USER: amo
         networks:
-            - nginx-php74-mysql8-node
+            - nginx-php74-mysql-rabbitmq
 
     phpmyadmin:
         image: phpmyadmin/phpmyadmin
@@ -60,12 +60,16 @@ services:
             PMA_HOST: mysql8-service
             MYSQL_ROOT_PASSWORD: my_password
         networks:
-             - nginx-php74-mysql8-node
+             - nginx-php74-mysql-rabbitmq
     rabbitmq:
         image: rabbitmq:3-management
         environment:
             RABBITMQ_DEFAULT_USER: rabbitmq_user
             RABBITMQ_DEFAULT_PASS: rabbitmq_password
+            RABBITMQ_DEFAULT_VHOST: "/"
+            RABBITMQ_URL: "amqp://rabbitmq_user:rabbitmq_password@rabbitmq_host:5672/%2F"
         ports:
             - "15672:15672"
             - "5672:5672"
+        networks:
+            - nginx-php74-mysql-rabbitmq

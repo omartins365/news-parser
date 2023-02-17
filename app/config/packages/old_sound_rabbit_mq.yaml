@@ -12,4 +12,5 @@ old_sound_rabbit_mq:
             exchange_options: { name: 'news_exchange', type: direct }
             queue_options:
                 name: 'news_queue'
+                routing_keys: ['news_routing_key']
             callback: 'App\MessageHandler\NewsConsumer::consume'

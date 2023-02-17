@@ -23,8 +23,8 @@
     <h1>Recent News</h1>
         
 	{% for newsItem in news %}
-		<div>
-			<h2>{{ newsItem.title }}</h2>
+		<div class="card mb-3 p-3">
+			<h4>{{ newsItem.title }}</h4>
 			<p>{{ newsItem.description }}</p>
 		</div>
 	{% endfor %}

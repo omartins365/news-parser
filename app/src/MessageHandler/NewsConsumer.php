@@ -35,7 +35,8 @@ class NewsConsumer implements ConsumerInterface
         
         $news =  $crawler->filter('.lenta-item')->each(function($node, $i){
             $title = $node->filter('a > h2')->text();
-            $description = $node->filter('p')->text();
+            $description = $node->filter('.lenta-item > p')->text();
+            // dd($description);
             $picture = $node->filter('div.lenta-image > img')->attr('src');
             $carbon = new Carbon();
             $timestr = $node->filter('.meta-datetime')->text();

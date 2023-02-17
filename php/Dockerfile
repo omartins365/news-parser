@@ -1,11 +1,13 @@
 FROM php:7.4-fpm
 
 RUN apt-get update && apt-get install -y zlib1g-dev g++ git libicu-dev zip libzip-dev zip \
-    && docker-php-ext-install intl opcache pdo pdo_mysql \
+    && docker-php-ext-install intl opcache pdo pdo_mysql sockets \
     && pecl install apcu \
     && docker-php-ext-enable apcu \
     && docker-php-ext-configure zip \
     && docker-php-ext-install zip
+
+# ENV RABBITMQ_URL amqp://rabbitmq_user:rabbitmq_password@rabbitmq_host:5672/%2F
 
 WORKDIR /var/www/project
 

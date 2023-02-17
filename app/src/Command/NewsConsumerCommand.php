@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Command;
 
 use App\MessageHandler\NewsConsumer;
@@ -7,6 +8,7 @@ use PhpAmqpLib\Connection\AMQPStreamConnection;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use OldSound\RabbitMqBundle\RabbitMq\ConsumerInterface;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 class NewsConsumerCommand extends Command
 {
@@ -21,12 +23,20 @@ class NewsConsumerCommand extends Command
     protected function configure()
     {
         $this->setName('app:news:consume')
-             ->setDescription('Consume news from RabbitMQ queue');
+            ->setDescription('Consume news from RabbitMQ queue');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
+
     {
-        $connection = new AMQPStreamConnection('localhost', 5672, 'guest', 'guest', '/');
+        $amqpUrl = "amqp://rabbitmq_user:rabbitmq_password@news-parser-rabbitmq-1:5672/";
+        $amqpUrlParts = parse_url($amqpUrl);
+        $connection = new AMQPStreamConnection(
+            $amqpUrlParts['host'],
+            $amqpUrlParts['port'],
+            $amqpUrlParts['user'],
+            $amqpUrlParts['pass']
+        );
         $channel = $connection->channel();
 
         $channel->basic_qos(null, 1, null);
