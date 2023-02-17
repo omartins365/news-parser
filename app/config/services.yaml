@@ -4,29 +4,72 @@
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
+    parser.worker_count: 5
 
 services:
-    # default configuration for services in *this* file
+  # default configuration for services in *this* file
     _defaults:
-        autowire: true      # Automatically injects dependencies in your services.
+        autowire: true # Automatically injects dependencies in your services.
         autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
 
-    # makes classes in src/ available to be used as services
-    # this creates a service per class whose id is the fully-qualified class name
+  # makes classes in src/ available to be used as services
+  # this creates a service per class whose id is the fully-qualified class name
     App\:
-        resource: '../src/'
+        resource: "../src/"
         exclude:
-            - '../src/DependencyInjection/'
-            - '../src/Entity/'
-            - '../src/Kernel.php'
-
-    # add more service definitions when explicit configuration is needed
-    # please note that last definitions always *replace* previous ones
-    old_sound_rabbit_mq.news_consumer_consumer:
-        class: App\MessageHandler\NewsConsumer
-        arguments: ['@doctrine.orm.entity_manager']
+        - "../src/DependencyInjection/"
+        - "../src/Entity/"
+        - "../src/Kernel.php"
+    App\Command\NewsConsumerCommand:
+        arguments:
+            $producer: '@old_sound_rabbit_mq.news_producer'
+            
+  # add more service definitions when explicit configuration is needed
+  # please note that last definitions always *replace* previous ones
+    old_sound_rabbit_mq.news_producer:
+        class: OldSound\RabbitMqBundle\RabbitMq\Producer
+        arguments:
+            - "news_producer"
         tags:
-            - { name: old_sound_rabbit_mq.consumer, routing_key: news }
+            - { name: monolog.logger, channel: rabbitmq }
 
+    old_sound_rabbit_mq.news_consumer_consumer:
+        class: OldSound\RabbitMqBundle\RabbitMq\Consumer
+        arguments:
+            - "@doctrine.orm.entity_manager"
+            - 'App\MessageHandler\NewsConsumer'
+            - "news_queue"
+            - "news_consumer"
+            - null
+        tags:
+            - { name: monolog.logger, channel: rabbitmq }
+        calls:
+            - [setQueueOptions, [{ durable: true }]]
+            - [setExchangeOptions, [{ name: "news_exchange", type: direct }]]
+            - [setCallback, ["consume"]]
+
+    App\MessageHandler\NewsConsumer:
+        arguments:
+            - "@logger"
+            - "@service_container"
+            - "%parser.worker_count%"
+            - "%kernel.project_dir%"
+
+    old_sound_rabbit_mq.parallel_news_consumer_consumer:
+        class: OldSound\RabbitMqBundle\RabbitMq\Consumer
+        arguments:
+            - "@doctrine.orm.entity_manager"
+            - 'App\MessageHandler\ParallelNewsConsumer'
+            - "news_queue"
+            - "news_consumer"
+            - null
+        tags:
+            - { name: monolog.logger, channel: rabbitmq }
+        calls:
+            - [setQueueOptions, [{ durable: true }]]
+            - [setExchangeOptions, [{ name: "news_exchange", type: direct }]]
+            - [setCallback, ["consume"]]
+    App\MessageHandler\ParallelNewsConsumer:
+        arguments: []
     # Use the UserPasswordEncoder instead of the PasswordEncoder
-    Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface: '@security.password_encoder'
+    Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface: "@security.password_encoder"

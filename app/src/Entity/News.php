@@ -10,6 +10,7 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class News
 {
+
     /**
      * @ORM\Id
      * @ORM\GeneratedValue
@@ -41,7 +42,10 @@ class News
      * @ORM\Column(type="datetime")
      */
     private $updated_at;
-
+    /**
+     * @ORM\Column(type="string", length=20)
+     */
+    
     public function getId(): ?int
     {
         return $this->id;
@@ -106,4 +110,6 @@ class News
 
         return $this;
     }
+
+
 }
