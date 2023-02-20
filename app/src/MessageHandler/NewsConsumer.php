@@ -2,65 +2,81 @@
 
 namespace App\MessageHandler;
 
+use Carbon\Carbon;
 use App\Entity\News;
+use GuzzleHttp\Client;
 use PhpAmqpLib\Message\AMQPMessage;
-use Symfony\Component\Process\Process;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\DomCrawler\Crawler;
 use OldSound\RabbitMqBundle\RabbitMq\ConsumerInterface;
-
-use Symfony\Component\DependencyInjection\ContainerInterface;
-
 class NewsConsumer implements ConsumerInterface
 {
     private $entityManager;
-    private $container;
+
     public function __construct(EntityManagerInterface $entityManager)
     {
         $this->entityManager = $entityManager;
     }
 
-    public function setContainer(ContainerInterface $container)
-    {
-        $this->container = $container;
-    }
     public function execute(AMQPMessage $msg)
     {
-        $newsMessage = unserialize($msg->body);
+        mb_internal_encoding("UTF-8");
+        $data = json_decode($msg->getBody(), true);
 
-        $title = $newsMessage->getTitle();
-        $description = $newsMessage->getDescription();
-        $picture = $newsMessage->getPicture();
-        $date = $newsMessage->getDate();
+        // Create a HTTP client
+        $client = new Client();
+
+        // Fetch the HTML content of the website
+        $response = $client->request('GET', 'https://highload.today/');
+        $html = (string) $response->getBody();
+
+        // Create a crawler to parse the HTML
+        $crawler = new Crawler($html);
         
-        dump($title);
-        // Check if the title already exists in the database
-        $existingNews = $this->entityManager->getRepository(News::class)->findOneBy(['title' => $title]);
-        if ($existingNews) {
-            // Update the updated_at column with the current date and time
-            $existingNews->setUpdatedAt($date);
-            $this->entityManager->flush();
-            return;
-        }
+        $news =  $crawler->filter('.lenta-item')->each(function($node, $i){
+            $title = $node->filter('a > h2')->text();
+            $description = $node->filter('.lenta-item > p')->text();
+            // dd($description);
+            $picture = $node->filter('div.lenta-image > img.wp-post-image')->attr('data-lazy-src');
+            // dd($picture);
+            $carbon = new Carbon();
+            $timestr = $node->filter('.meta-datetime')->text();
+            // dump($timestr);
+            // $timestr = iconv('UTF-8', 'Windows-1251', $timestr);
+            $timestr = str_replace("назад","ago",$timestr);
+            // dump($timestr);
+            $timestr = mb_convert_encoding($timestr, 'UTF-8', 'auto');
+            $date = Carbon::parseFromLocale(($timestr), 'ru');
+            
+            dump($title, $date->calendar());
+            // Check if the title already exists in the database
+            $existingNews = $this->entityManager->getRepository(News::class)->findOneBy(['title' => $title]);
+            if ($existingNews) {
+                // Update the updated_at column with the current date and time
+                $existingNews->setUpdatedAt($date);
+                $this->entityManager->flush();
+                return;
+            }
+
+
+            // Create a new News object and set its properties
+            $newsItem = new News();
+            $newsItem->setTitle($title);
+            $newsItem->setDescription($description);
+            $newsItem->setPicture($picture);
+            $newsItem->setDate($date);
+            $newsItem->setUpdatedAt($date);
+            $this->entityManager->persist($newsItem);
+            // return $newsItem;
+            // Add the News object to the list of news to save to the database\
+        });
+
         // dd($news);
         // Save the news to the database
-        $newsItem = new News();
-        $newsItem->setTitle($title);
-        $newsItem->setDescription($description);
-        $newsItem->setPicture($picture);
-        $newsItem->setDate($date);
-        $newsItem->setUpdatedAt($date);
-
-        $this->entityManager->persist($newsItem);
         $this->entityManager->getRepository(News::class);
 
-
+        
         $this->entityManager->flush();
-
-
-        $process = new Process(['php', 'bin/console', 'app:process-news', $news->getId()]);
-        $process->start();
-
-        return ConsumerInterface::MSG_ACK;
     }
 
     public function consume(AMQPMessage $msg)

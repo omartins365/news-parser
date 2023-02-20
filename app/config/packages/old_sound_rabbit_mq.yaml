@@ -5,34 +5,12 @@ old_sound_rabbit_mq:
     producers:
         news_producer:
             connection: default
-            exchange_options:
-                name: 'news_exchange'
-                type: 'direct'
-                durable: true
-            queue_options:
-                name: 'news_queue'
-                durable: true
-            default_routing_key: 'news_routing_key'
+            exchange_options: { name: 'news_exchange', type: direct }
     consumers:
         news_consumer:
             connection: default
-            exchange_options:
-                name: 'news_exchange'
-                type: 'direct'
-                durable: true
+            exchange_options: { name: 'news_exchange', type: direct }
             queue_options:
                 name: 'news_queue'
-                durable: true
+                routing_keys: ['news_routing_key']
             callback: 'App\MessageHandler\NewsConsumer::consume'
-            qos_options: { prefetch_count: 1 }
-        parallel_news_consumer:
-            connection: default
-            exchange_options:
-                name: 'news_exchange'
-                type: 'direct'
-                durable: true
-            queue_options:
-                name: 'news_queue'
-                durable: true
-            callback: 'App\MessageHandler\ParallelNewsConsumer::consume'
-            qos_options: { prefetch_count: 1 }
