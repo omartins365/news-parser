@@ -236,5 +236,3 @@ Feel free to contribute to this repository by opening a pull request.
 |    |—— crontab
 |—— rabbit_config.json
 ```
-
-## Code Details

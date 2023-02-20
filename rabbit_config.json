@@ -1,0 +1,78 @@
+{
+    "rabbit_version": "3.11.9",
+    "rabbitmq_version": "3.11.9",
+    "product_name": "RabbitMQ",
+    "product_version": "3.11.9",
+    "users": [
+        {
+            "name": "rabbitmq_user",
+            "password_hash": "DlQJluSkwbUQPXyU9rgccrXZiNmGww1IlfLIZivQ4YWlRcZq",
+            "hashing_algorithm": "rabbit_password_hashing_sha256",
+            "tags": [
+                "administrator"
+            ],
+            "limits": {}
+        }
+    ],
+    "vhosts": [
+        {
+            "name": "/"
+        }
+    ],
+    "permissions": [
+        {
+            "user": "rabbitmq_user",
+            "vhost": "/",
+            "configure": ".*",
+            "write": ".*",
+            "read": ".*"
+        }
+    ],
+    "topic_permissions": [],
+    "parameters": [],
+    "global_parameters": [
+        {
+            "name": "internal_cluster_id",
+            "value": "rabbitmq-cluster-id-3nN-En2MqdR7bXXfFQeabw"
+        }
+    ],
+    "policies": [],
+    "queues": [
+        {
+            "name": "news_queue",
+            "vhost": "/",
+            "durable": true,
+            "auto_delete": false,
+            "arguments": {}
+        }
+    ],
+    "exchanges": [
+        {
+            "name": "news_exchange",
+            "vhost": "/",
+            "type": "direct",
+            "durable": true,
+            "auto_delete": false,
+            "internal": false,
+            "arguments": {}
+        }
+    ],
+    "bindings": [
+        {
+            "source": "news_exchange",
+            "vhost": "/",
+            "destination": "news_queue",
+            "destination_type": "queue",
+            "routing_key": "news",
+            "arguments": {}
+        },
+        {
+            "source": "news_exchange",
+            "vhost": "/",
+            "destination": "news_queue",
+            "destination_type": "queue",
+            "routing_key": "news_routing_key",
+            "arguments": {}
+        }
+    ]
+}

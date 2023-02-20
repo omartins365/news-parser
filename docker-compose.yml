@@ -68,7 +68,7 @@ services:
             RABBITMQ_DEFAULT_USER: rabbitmq_user
             RABBITMQ_DEFAULT_PASS: rabbitmq_password
             RABBITMQ_DEFAULT_VHOST: "/"
-            RABBITMQ_URL: "amqp://rabbitmq_user:rabbitmq_password@rabbitmq_host:5672/%2F"
+            RABBITMQ_URL: "amqp://rabbitmq_user:rabbitmq_password@rabbitmq-container:5672/%2F"
         ports:
             - "15672:15672"
             - "5672:5672"

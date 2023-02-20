@@ -29,7 +29,7 @@ class NewsConsumerCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output)
 
     {
-        $amqpUrl = "amqp://rabbitmq_user:rabbitmq_password@news-parser-rabbitmq-1:5672/";
+        $amqpUrl = $_ENV['RABBITMQ_URL'];
         $amqpUrlParts = parse_url($amqpUrl);
         $connection = new AMQPStreamConnection(
             $amqpUrlParts['host'],
