@@ -24,7 +24,9 @@ Before proceeding, you need to make sure you have the following tools installed 
 
 **Clone the repository** 
 
-`**e.g. to news-parser/**`
+```bash
+git clone git@github.com:omartins365/news-parser.git
+```
 
 Copy the contents of the **docker** folder to the root of your project:
 
