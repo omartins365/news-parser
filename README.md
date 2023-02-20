@@ -66,6 +66,14 @@ docker exec rabbitmq-container rabbitmqctl import_definitions rabbit_config.json
 
 Visit **http://localhost:8080** in your browser to see the application running.
 
+**Demo Credentials**  
+**Admin**  
+email : admin@example.com    
+password : password  
+**Moderator**  
+email : moderator@example.com    
+password : password
+
 Visit **http://localhost:15672/** in your browser to open RabbitMQ management gui.
 
 ## **Running commands**
