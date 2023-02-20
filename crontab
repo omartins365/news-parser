@@ -1,0 +1,1 @@
+* * * * * root php /app/bin/console app:news:consume >> /var/log/cron.log 2>&1
